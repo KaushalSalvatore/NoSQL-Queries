@@ -20,6 +20,20 @@ successful installation, Cassandra uses a prompt known as Cassandra query langua
 ```bash
 Cassandra stores copies (called replicas) of each row based on the row key. The replication factor refers to the number 
 of nodes that will act as copies (replicas) of each row of data.
+
+The replication factor (RF) is the number of copies (replicas) of each piece of data stored in a Cassandra cluster.
+
+Example:
+
+RF = 3 → Each piece of data exists on three different nodes.
+RF = 2 → Two copies on two nodes.
+The replication factor is configured per keyspace, not globally.
+
+Impact of RF:
+
+Higher RF = higher availability and durability, but more storage usage.
+RF must always be greater than or equal to the highest consistency level you plan to use.
+In multi-data center setups, RF is defined per DC, e.g.:
 ```
 
 #### Q-4 What do you mean by replication Strategy ?
@@ -68,8 +82,58 @@ index.
 #### Q-7 Explain the terms Memtable, CommitLog and SSTables ?
 ```bash
 Commit log: The Commit log is a crash-recovery mechanism that supports Cassandra’s durability goals
+The commit log is a crucial durability component in Cassandra’s write path. It is an append-only log file on 
+disk where every write operation is recorded before being acknowledged. 
+
+How commit log works in the write path:
+Client sends a write request.
+Cassandra writes the data to the commit log (on disk) to guarantee durability.
+The same data is written to the memtable (in RAM) for fast access.
+Once the memtable is full, it is flushed to disk as an SSTable.
+After successful flush, the related portion of commit log can be discarded.
+
+Key properties of the commit log:
+Durability — protects against power loss or crashes.
+Append-only — minimizes disk seeks and improves write speed.
+Segmented — split into segments so they can be deleted after flush.
+Sequential writes — extremely fast due to no random I/O.
+
+
 MemTable: MemTable is an in-memory data structure that corresponds to a CQL table
+A Memtable is an in-memory, sorted data structure where Cassandra stores written data temporarily before 
+flushing it to disk as an SSTable.
+
+Write path process:
+
+Data is written to the commit log for durability.
+Data is written to the memtable for fast in-memory access.
+When the memtable becomes full, it is flushed to disk as an SSTable.
+Characteristics of Memtables:
+
+They store data in sorted order.
+Each table has its own memtable.
+Memtables are volatile (in-memory), but commit logs ensure durability.
+Flushing is triggered by thresholds such as size or time.
+
 SSTable: The contents of the memtable are flushed to disk in a file called an SSTable.
+A SSTable (Sorted String Table) is an immutable, disk-based data file used by Cassandra to store data permanently. 
+SSTables are created during flush operations when in-memory data (memtables) is written to disk.
+Key features:
+
+Immutable (never changed once written)
+Data is sorted by partition key and clustering key
+Stored as multiple components:
+Data file
+Index file
+Summary file
+Bloom filter
+Compression offsets
+Benefits of SSTables:
+
+Fast sequential writes
+Efficient reads using indexes and bloom filters
+Compaction merges SSTables to reduce fragmentation
+Immutable nature avoids locking issues
 ```
 
 #### Q-8 What is Python Stress test in Cassandra ?
@@ -98,7 +162,26 @@ needs.
 #### Q-11 Explain the role of the gossip protocol in Cassandra ?
 ```bash
 The gossip protocol in Cassandra is a peer-to-peer communication mechanism that nodes use to share state information. 
-It helps in detecting node failures and ensuring data consistency across the cluster
+It helps in detecting node failures and ensuring data consistency across the cluster.
+
+The Gossip protocol in Cassandra is a peer-to-peer communication protocol that nodes use to exchange information about:
+
+Their own health status
+Other nodes' status (reachable/unreachable)
+Schema changes
+Token ownership
+Gossip runs every second and spreads information quickly across the cluster.
+
+Key features:
+Decentralized
+Lightweight
+Fault-tolerant
+Eventually consistent state sharing
+Each gossip round involves:
+
+A node randomly picks another node.
+They exchange state information.
+Knowledge spreads exponentially (like virus transmission).
 ```
 
 #### Q-12 What is the purpose of the TTL (Time to Live) in Cassandra ? How do you set it ?
