@@ -5,6 +5,7 @@ MongoDB is an open source, document-oriented, NoSql database whose data is store
 It is scalable and easy to learn, commonly used in modern web and mobile apps, dealing with high volumes of data. 
 MongoDB stores data in BSON format, which lets you store JSON like documents efficiently.
 
+```bash
 // MongoDB Hello World Program
 
 const { MongoClient } = require('mongodb');
@@ -34,6 +35,7 @@ async function run() {
 }
 
 run().catch(console.error);
+```
 
 Apache Cassandra is an open source, distributed and decentralized/distributed storage system (database), for managing very large amounts of structured data spread out across the world. It provides highly available service with no single point of failure.
 
@@ -50,11 +52,11 @@ Created at Facebook, it differs sharply from relational database management syst
 Cassandra implements a Dynamo-style replication model with no single point of failure, but adds a more powerful column family data model.
 
 Cassandra is being used by some of the biggest companies such as Facebook, Twitter, Cisco, Rackspace, ebay, Twitter, Netflix, and more.
-
+```bash
 cqlsh:> CAPTURE '/home/hadoop/CassandraProgs/Outputfile'
 cqlsh:> select * from emp;
 cqlsh:> COPY emp (emp_id, emp_city, emp_name, emp_phone,emp_sal) TO myfile;
-
+```
 
 
 ![Image 1](/images/mongodb-image-01.png)
